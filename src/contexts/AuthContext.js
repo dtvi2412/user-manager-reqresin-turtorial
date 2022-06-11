@@ -20,9 +20,19 @@ const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(user));
   };
 
+  const logout = () => {
+    setUser({
+      email: '',
+      token: '',
+    });
+
+    localStorage.removeItem('user');
+  };
+
   const data = {
     user,
     login,
+    logout,
   };
   return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };

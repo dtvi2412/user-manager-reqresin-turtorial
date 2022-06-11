@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import httpRequest from '../utils/request';
 function Login() {
@@ -10,7 +10,13 @@ function Login() {
 
   const navigate = useNavigate();
 
-  const { login } = useContext(AuthContext);
+  const { user: authUser, login } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (authUser.email) {
+      navigate('/');
+    }
+  }, [authUser.email, navigate]);
 
   const handleChange = (e) => {
     setUser((prev) => {
