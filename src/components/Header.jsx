@@ -7,8 +7,16 @@ function Header() {
 
   return (
     <header className="bg-blue-700 text-white flex items-center justify-between p-4">
-      <div>Api.Reqres</div>
-      <div>Dashboard</div>
+      <div className="flex items-center gap-2">
+        <Link to="/">
+          <span>Api.Reqres</span>
+        </Link>
+
+        <Link to="/dashboard">
+          <span>Dashboard</span>
+        </Link>
+      </div>
+
       <div>
         {user.email ? (
           <div className="font-bold flex items-center gap-2">
