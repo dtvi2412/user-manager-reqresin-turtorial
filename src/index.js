@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import AuthProvider from './contexts/AuthContext';
+import User from './pages/User';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -17,6 +18,7 @@ root.render(
           <Route path="/" element={<App />}>
             <Route index element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/users/:id" element={<User />} />
           </Route>
 
           <Route path="/login" element={<Login />} />

@@ -1,6 +1,7 @@
 import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import httpRequest from './../utils/request';
+import { Link } from 'react-router-dom';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -14,7 +15,6 @@ function Dashboard() {
       try {
         const res = await httpRequest.get(`users?page=${page}`);
 
-        console.log(res);
         setUsers([...res.data.data]);
         setPagination(res.data.total_pages);
       } catch (err) {
@@ -23,8 +23,6 @@ function Dashboard() {
     };
     fetchUsers();
   }, [page]);
-
-  console.log('users', users);
 
   if (!user.email) {
     return (
@@ -43,6 +41,7 @@ function Dashboard() {
               <th>First_name</th>
               <th>Last_name</th>
               <th>Avatar</th>
+              <th>View Detail</th>
             </tr>
           </thead>
           <tbody>
@@ -58,6 +57,13 @@ function Dashboard() {
                     src={user.avatar}
                     alt={user.first_name}
                   />
+                </td>
+                <td>
+                  <Link to={`/users/${user.id}`}>
+                    <span className="px-2 py-1 bg-green-500 text-white rounded-md cursor-pointer hover:bg-green-700">
+                      View detail
+                    </span>
+                  </Link>
                 </td>
               </tr>
             ))}
