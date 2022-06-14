@@ -2,6 +2,8 @@ import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import httpRequest from './../utils/request';
 import { Link } from 'react-router-dom';
+import Dialog from '../components/Dialog';
+import useDialog from '../hooks/useDialog';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -9,6 +11,8 @@ function Dashboard() {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
+
+  const { dialog, closeDialog, handleChangeDialog } = useDialog();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -42,6 +46,7 @@ function Dashboard() {
               <th>Last_name</th>
               <th>Avatar</th>
               <th>View Detail</th>
+              <th>Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -64,6 +69,19 @@ function Dashboard() {
                       View detail
                     </span>
                   </Link>
+                </td>
+                <td>
+                  <span
+                    onClick={() => {
+                      handleChangeDialog(
+                        true,
+                        'Are you sure you want to delete!'
+                      );
+                    }}
+                    className="px-2 py-1 bg-red-600 text-white rounded-md cursor-pointer hover:bg-red-700"
+                  >
+                    Delete
+                  </span>
                 </td>
               </tr>
             ))}
@@ -91,11 +109,28 @@ function Dashboard() {
       });
   };
 
+  const handleDelete = (id) => {
+    console.log('delete');
+  };
+
+  const renderDialog = () => {
+    if (dialog.isOpen) {
+      return (
+        <Dialog
+          message={dialog.message}
+          onClose={closeDialog}
+          onSubmit={() => handleDelete('aas')}
+        />
+      );
+    }
+  };
+
   return (
     <div>
       <div className="w-[80%] mx-auto mt-10">
         {renderUsersTable()}
         <div className="mt-2">{renderPagination()}</div>
+        {renderDialog()}
       </div>
     </div>
   );
