@@ -1,4 +1,7 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import { AuthContext } from '../contexts/AuthContext';
 import httpRequest from './../utils/request';
 import { Link } from 'react-router-dom';
@@ -11,6 +14,8 @@ function Dashboard() {
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
+
+  const userIdRef = useRef(null);
 
   const { dialog, closeDialog, handleChangeDialog } = useDialog();
 
@@ -75,8 +80,10 @@ function Dashboard() {
                     onClick={() => {
                       handleChangeDialog(
                         true,
-                        'Are you sure you want to delete!'
+                        `Are you sure you want to delete ${user.first_name}?`
                       );
+
+                      userIdRef.current = user.id;
                     }}
                     className="px-2 py-1 bg-red-600 text-white rounded-md cursor-pointer hover:bg-red-700"
                   >
@@ -109,8 +116,19 @@ function Dashboard() {
       });
   };
 
-  const handleDelete = (id) => {
-    console.log('delete');
+  const handleDelete = async () => {
+    try {
+      const res = await httpRequest.delete(`users/${userIdRef.current}`);
+      const STATUS_SUCCESS = 204;
+      if (res.status === STATUS_SUCCESS) {
+        setUsers((prev) => prev.filter((u) => u.id !== userIdRef.current));
+        closeDialog();
+
+        toast.success('Delete Successfully!');
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const renderDialog = () => {
@@ -119,7 +137,7 @@ function Dashboard() {
         <Dialog
           message={dialog.message}
           onClose={closeDialog}
-          onSubmit={() => handleDelete('aas')}
+          onSubmit={() => handleDelete()}
         />
       );
     }
@@ -131,6 +149,7 @@ function Dashboard() {
         {renderUsersTable()}
         <div className="mt-2">{renderPagination()}</div>
         {renderDialog()}
+        <ToastContainer />
       </div>
     </div>
   );
