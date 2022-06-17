@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import Dialog from '../components/Dialog';
 import useDialog from '../hooks/useDialog';
 import PopupAdd from '../components/PopupAdd';
+import PopupEdit from '../components/PopupEdit';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -21,6 +22,12 @@ function Dashboard() {
   const { dialog, closeDialog, handleChangeDialog } = useDialog();
 
   const [popupAdd, setPopupAdd] = useState({
+    isOpen: false,
+    name: '',
+    job: '',
+  });
+
+  const [popupEdit, setPopupEdit] = useState({
     isOpen: false,
     name: '',
     job: '',
@@ -58,6 +65,7 @@ function Dashboard() {
               <th>Last_name</th>
               <th>Avatar</th>
               <th>View Detail</th>
+              <th>Edit</th>
               <th>Delete</th>
             </tr>
           </thead>
@@ -81,6 +89,21 @@ function Dashboard() {
                       View detail
                     </span>
                   </Link>
+                </td>
+                <td>
+                  <span
+                    onClick={() => {
+                      setPopupEdit({
+                        isOpen: true,
+                        name: user.first_name,
+                        job: 'it',
+                      });
+                      userIdRef.current = user.id;
+                    }}
+                    className="px-2 py-1 bg-lime-500 text-white rounded-md cursor-pointer hover:bg-lime-700"
+                  >
+                    Edit
+                  </span>
                 </td>
                 <td>
                   <span
@@ -158,6 +181,53 @@ function Dashboard() {
     }
   };
 
+  const handleClosePopupEdit = () => {
+    setPopupEdit({
+      isOpen: false,
+      name: '',
+      job: '',
+    });
+  };
+
+  const handleUpdateUser = async (e, user) => {
+    e.preventDefault();
+
+    try {
+      const res = await httpRequest.put(`users/${userIdRef.current}`, user);
+
+      const STATUS_UPDATE_SUCCESS = 200;
+      if (res.status === STATUS_UPDATE_SUCCESS) {
+        setUsers((prev) => {
+          return prev.map((u) => {
+            if (u.id === userIdRef.current) {
+              return { ...u, first_name: res.data.name };
+            }
+            return { ...u };
+          });
+        });
+
+        toast.success('Update user successfully!');
+
+        handleClosePopupEdit();
+      }
+      console.log('res', res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const renderPopupEdit = () => {
+    if (popupEdit.isOpen) {
+      return (
+        <PopupEdit
+          userProp={{ name: popupEdit.name, job: popupEdit.job }}
+          onSubmit={handleUpdateUser}
+          onClose={handleClosePopupEdit}
+        />
+      );
+    }
+  };
+
   const handleAddUser = async (e, obj) => {
     e.preventDefault();
     if (!obj.name || !obj.job) {
@@ -210,6 +280,7 @@ function Dashboard() {
         </button>
         {renderUsersTable()}
         {renderPopupAdd()}
+        {renderPopupEdit()}
         <div className="mt-2">{renderPagination()}</div>
         {renderDialog()}
         <ToastContainer />
