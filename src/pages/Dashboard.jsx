@@ -269,6 +269,24 @@ function Dashboard() {
     });
   };
 
+  const handleSort = (value) => {
+    const name = value.split(' ')[0];
+    const type = value.split(' ')[1];
+
+    const sortUsers = [...users];
+
+    sortUsers.sort((a, b) => {
+      if (name === 'id') {
+        return type === 'asc' ? a.id - b.id : b.id - a.id;
+      }
+
+      return type === 'asc'
+        ? ('' + a[name]).localeCompare(b[name])
+        : ('' + b[name]).localeCompare(a[name]);
+    });
+
+    setUsers(sortUsers);
+  };
   return (
     <div>
       <div className="w-[80%] mx-auto mt-10">
@@ -278,6 +296,19 @@ function Dashboard() {
         >
           Add user
         </button>
+        <select
+          defaultValue=""
+          onChange={(e) => handleSort(e.target.value)}
+          className="px-2 py-1 rounded-md ml-2 bg-violet-500 text-white"
+        >
+          <option value="" disabled>
+            Sort by options
+          </option>
+          <option value="email asc">Email (A-Z)</option>
+          <option value="email desc">Email (Z-A)</option>
+          <option value="id asc">ID (A-Z)</option>
+          <option value="id desc">ID (Z-A)</option>
+        </select>
         {renderUsersTable()}
         {renderPopupAdd()}
         {renderPopupEdit()}
