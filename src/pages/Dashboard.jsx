@@ -2,6 +2,7 @@ import { useContext, useState, useEffect, useRef } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { AuthContext } from '../contexts/AuthContext';
 import httpRequest from './../utils/request';
 import { Link } from 'react-router-dom';
@@ -9,14 +10,17 @@ import Dialog from '../components/Dialog';
 import useDialog from '../hooks/useDialog';
 import PopupAdd from '../components/PopupAdd';
 import PopupEdit from '../components/PopupEdit';
+import useDebounce from '../hooks/useDebounce';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
 
   const [users, setUsers] = useState([]);
+  const [fullUsers, setFullUsers] = useState([]);
+
   const [pagination, setPagination] = useState(null);
   const [page, setPage] = useState(1);
-
+  const [search, setSearch] = useState('');
   const userIdRef = useRef(null);
 
   const { dialog, closeDialog, handleChangeDialog } = useDialog();
@@ -33,12 +37,30 @@ function Dashboard() {
     job: '',
   });
 
+  const { valueDebounce, loading } = useDebounce(search, 500); //0.5s
+
+  useEffect(() => {
+    if (!valueDebounce) {
+      setUsers(fullUsers);
+      return;
+    }
+
+    const search = (data, key) => {
+      return data.filter((item) =>
+        item[key].toLowerCase().includes(valueDebounce.toLowerCase())
+      );
+    };
+
+    //Search email
+    setUsers((prev) => search(prev, 'email'));
+  }, [valueDebounce, fullUsers]);
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const res = await httpRequest.get(`users?page=${page}`);
 
         setUsers([...res.data.data]);
+        setFullUsers([...res.data.data]);
         setPagination(res.data.total_pages);
       } catch (err) {
         console.log(err);
@@ -309,6 +331,22 @@ function Dashboard() {
           <option value="id asc">ID (A-Z)</option>
           <option value="id desc">ID (Z-A)</option>
         </select>
+
+        <div className="relative w-[200px] h-[40px] flex items-center justify-center ">
+          <div>
+            <input
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search..."
+              className="border border-gray-500 px-2 py-1 rounded-sm"
+            />
+            {loading && (
+              <span className="absolute right-2 top-1/2 -translate-y-1/2">
+                <AiOutlineLoading3Quarters className="animate-spin text-lime-600" />
+              </span>
+            )}
+          </div>
+        </div>
+
         {renderUsersTable()}
         {renderPopupAdd()}
         {renderPopupEdit()}
