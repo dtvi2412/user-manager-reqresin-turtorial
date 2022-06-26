@@ -11,6 +11,7 @@ import useDialog from '../hooks/useDialog';
 import PopupAdd from '../components/PopupAdd';
 import PopupEdit from '../components/PopupEdit';
 import useDebounce from '../hooks/useDebounce';
+import NeedLogin from '../components/NeedLogin';
 
 function Dashboard() {
   const { user } = useContext(AuthContext);
@@ -70,9 +71,7 @@ function Dashboard() {
   }, [page]);
 
   if (!user.email) {
-    return (
-      <div className="bg-red-600 text-white py-4 text-center">Need Login!</div>
-    );
+    return <NeedLogin />;
   }
 
   const renderUsersTable = () => {

@@ -6,7 +6,7 @@ function Header() {
   const { user, logout } = useContext(AuthContext);
 
   return (
-    <header className="bg-blue-700 text-white flex items-center justify-between p-4">
+    <header className="bg-blue-700 text-white flex items-center justify-between p-4 h-[60px] ">
       <div className="flex items-center gap-2">
         <Link to="/">
           <span>Api.Reqres</span>

@@ -14,7 +14,6 @@ function PopupAdd({ onSubmit, onClose }) {
     });
   };
 
-  console.log(user);
   return (
     <BackgroundBlack>
       <form className="bg-white p-4 rounded-md flex flex-col gap-2">
